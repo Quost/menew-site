@@ -33,7 +33,6 @@ jobs:
       contents: read
       id-token: write  # keyless login to Google Cloud (Workload Identity Federation)
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub API rate limit only; the app repos are public
       PYTHONUTF8: "1"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -44,10 +43,14 @@ jobs:
       - name: Anything new since the live build?
         id: poll
         if: github.event_name == 'schedule'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub API rate limit only (read-only; the app repos are public)
         run: python3 scripts/sources.py --compare https://menew.pururucos.com.br/build.json
 
       - name: Build and check the site
         if: steps.poll.outputs.changed != 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python3 scripts/build.py --out public
 
       - name: Keep the built site for review (deploys are off)
