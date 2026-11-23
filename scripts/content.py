@@ -14,6 +14,8 @@ It is also a command-line validator, used by the app repositories' CI:
 
 Exit code 0 when the content is valid, 1 with a list of every problem otherwise. Python standard library only.
 """
+from __future__ import annotations
+
 import json
 import os
 import re

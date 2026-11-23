@@ -9,3 +9,8 @@ updates:
     groups:
       actions:
         patterns: ["*"]
+    ignore:
+      # The deploy login stays on google-github-actions/auth v2 (Workload Identity Federation setup) until the
+      # maintainer decides to move to a new major version; patch and minor updates still come.
+      - dependency-name: google-github-actions/auth
+        update-types: ["version-update:semver-major"]
