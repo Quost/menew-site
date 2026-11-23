@@ -1,0 +1,6 @@
+public/
+__pycache__/
+*.pyc
+.firebase/
+firebase-debug.log
+.DS_Store

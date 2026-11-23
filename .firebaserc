@@ -1,0 +1,20 @@
+{
+  "projects": {
+    "default": "menew-prd"
+  },
+  "targets": {
+    "menew-prd": {
+      "hosting": {
+        "menew": [
+          "menew-pururucos"
+        ],
+        "menew-legacy": [
+          "menew"
+        ],
+        "menew-legacy-prd": [
+          "menew-prd"
+        ]
+      }
+    }
+  }
+}

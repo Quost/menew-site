@@ -1,0 +1,39 @@
+name: CI
+
+# Every pull request: build the whole site from the app repos' current main content and the latest releases, and run
+# the same checks a deploy runs (every page and language present, internal links valid, no menew.web.app, canonical,
+# hreflang, sitemap, robots.txt, llms.txt, build.json, IndexNow key, og images). The job name is a required check.
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  site:
+    name: Build and check site
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Scripts compile
+        run: python3 -m py_compile scripts/*.py
+      - name: Build and check the site
+        run: python3 scripts/build.py --out public
+      - name: Keep the built site (download it to preview locally)
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: site
+          path: public
+          retention-days: 7

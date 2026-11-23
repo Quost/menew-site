@@ -1,0 +1,55 @@
+{
+  "overview": {
+    "template": "overview.html",
+    "shots": "mac"
+  },
+  "platforms": {
+    "mac": {
+      "name": "Mac",
+      "repo": "Quost/menew",
+      "page": "mac",
+      "template": "mac.html",
+      "assets_url": "/assets",
+      "release": "stable",
+      "fallback": null,
+      "shared": [
+        "alt_actions", "badge_new", "coffee_button", "coffee_text", "download_mac", "download_menew", "footer_bug",
+        "footer_contribute", "footer_linux", "footer_releases", "footer_source", "license", "mac_see_all", "nav_features",
+        "nav_linux", "nav_windows", "plat_linux_cta", "plat_win_t", "platforms", "site_stats", "sponsor_button", "star",
+        "version", "view_source"
+      ],
+      "required": ["mac_title", "mac_meta_desc", "copied", "ai_prompt"],
+      "screenshots": ["popover-now", "hub-memory", "hub-recordings", "palette", "panel0", "popover-actions", "capture", "popover-notes"]
+    },
+    "linux": {
+      "name": "Linux",
+      "repo": "Quost/menew-linux",
+      "page": "linux",
+      "template": "linux.html",
+      "assets_url": "/assets/linux",
+      "release": "any",
+      "fallback": null,
+      "shared": [
+        "star", "license", "footer_source", "site_stats", "sponsor_button", "coffee_text", "coffee_button", "footer_bug",
+        "footer_contribute"
+      ],
+      "required": ["pc1_t", "pc1_d", "cc1_t", "cc1_d", "tl1_t", "tl1_d", "n1_t", "n1_d"],
+      "screenshots": ["palette", "palette-conversion", "clipboard", "clipboard-images", "capture-editor", "monitor"]
+    },
+    "windows": {
+      "name": "Windows",
+      "repo": "Quost/menew-windows",
+      "page": "windows",
+      "template": "windows.html",
+      "assets_url": "/assets/windows",
+      "release": "any",
+      "fallback": "site/fallback/windows",
+      "shared": [
+        "download_mac", "footer_linux", "footer_source", "mac_see_all", "nav_features", "nav_linux", "nav_mac",
+        "plat_linux_cta", "site_stats", "view_source", "version"
+      ],
+      "required": ["win_title", "win_meta_desc", "win_dl_title", "win_dl_meta_desc", "win_dl_lead", "win_card_d"],
+      "screenshots": []
+    }
+  }
+}

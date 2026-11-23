@@ -1,0 +1,99 @@
+name: Deploy
+
+# Builds https://menew.pururucos.com.br from this repo (layout, overview, /vs, SEO) plus each app repo's site/ content
+# and the GitHub Releases, then deploys it to Firebase Hosting (project menew-prd).
+#   - push to main and manual runs: always build (and deploy, when enabled);
+#   - every 30 minutes: compare a cheap fingerprint (app repos' latest site/ commits + latest releases + this repo's
+#     commit) with https://menew.pururucos.com.br/build.json and stop right there when nothing changed.
+# No cross-repo tokens: the app repos never call this workflow; it polls them with the read-only GITHUB_TOKEN.
+# Deploying is off until the repo variable DEPLOY_ENABLED is "true" (until then the built site is kept as an artifact).
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: "*/30 * * * *"
+
+permissions:
+  contents: read
+
+# One deploy at a time; a newer run waits instead of cancelling a deploy halfway
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and deploy
+    # The scheduled poll only makes sense once deploys are enabled
+    if: github.event_name != 'schedule' || vars.DEPLOY_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write  # keyless login to Google Cloud (Workload Identity Federation)
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # GitHub API rate limit only; the app repos are public
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0  # the "last updated" date of the pages comes from this repo's history
+          persist-credentials: false
+
+      - name: Anything new since the live build?
+        id: poll
+        if: github.event_name == 'schedule'
+        run: python3 scripts/sources.py --compare https://menew.pururucos.com.br/build.json
+
+      - name: Build and check the site
+        if: steps.poll.outputs.changed != 'false'
+        run: python3 scripts/build.py --out public
+
+      - name: Keep the built site for review (deploys are off)
+        if: steps.poll.outputs.changed != 'false' && vars.DEPLOY_ENABLED != 'true'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: site
+          path: public
+          retention-days: 7
+
+      - name: Log in to Google Cloud (keyless)
+        if: steps.poll.outputs.changed != 'false' && vars.DEPLOY_ENABLED == 'true'
+        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2.1.13
+        with:
+          workload_identity_provider: ${{ vars.WIF_PROVIDER }}
+          service_account: ${{ vars.WIF_SERVICE_ACCOUNT }}
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        if: steps.poll.outputs.changed != 'false' && vars.DEPLOY_ENABLED == 'true'
+        with:
+          node-version: 22
+
+      # Target "menew" = site menew-pururucos (menew.pururucos.com.br, folder public/); "menew-legacy" (menew.web.app)
+      # and "menew-legacy-prd" (menew-prd.web.app) only 301 to it (hosting-redirect/). One site per target.
+      - name: Deploy to Firebase Hosting
+        if: steps.poll.outputs.changed != 'false' && vars.DEPLOY_ENABLED == 'true'
+        run: >-
+          npx --yes firebase-tools@15.35.0 deploy
+          --only hosting:menew,hosting:menew-legacy,hosting:menew-legacy-prd
+          --project menew-prd --non-interactive
+
+      - name: Tell search engines (IndexNow)
+        if: steps.poll.outputs.changed != 'false' && vars.DEPLOY_ENABLED == 'true'
+        run: python3 scripts/indexnow.py public
+
+      - name: Summary
+        if: always()
+        env:
+          CHANGED: ${{ steps.poll.outputs.changed }}
+          DEPLOY_ENABLED: ${{ vars.DEPLOY_ENABLED }}
+        run: |
+          if [ "$CHANGED" = false ]; then
+            echo "Nothing changed since the live build: skipped." >> "$GITHUB_STEP_SUMMARY"
+          elif [ "$DEPLOY_ENABLED" != true ]; then
+            echo "Built and checked; not deployed (DEPLOY_ENABLED is not true). The site is in the 'site' artifact." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Built, checked and deployed." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ -f public/build.json ]; then { echo '```json'; cat public/build.json; echo '```'; } >> "$GITHUB_STEP_SUMMARY"; fi
