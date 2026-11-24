@@ -29,6 +29,8 @@ jobs:
           persist-credentials: false
       - name: Scripts compile
         run: python3 -m py_compile scripts/*.py
+      - name: Unit tests
+        run: python3 -m unittest discover -s tests
       - name: Build and check the site
         run: python3 scripts/build.py --out public
       - name: Keep the built site (download it to preview locally)

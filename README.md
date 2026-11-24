@@ -73,7 +73,7 @@ site/
 | `contract` | Always `1` for now. A future incompatible change bumps it. |
 | `platform` | `mac`, `linux` or `windows` (the key in `platforms.json`). |
 | `assets` | Optional. Folder with the screenshots, relative to `site/`, inside the repository. Default `assets` (that is, `site/assets/`). The Mac and Linux repos use `../docs/assets`, the folder their README already uses, so there is a single copy of each image. |
-| `texts` | One object per language: `en`, `pt`, `de`, `es`, `zh`, no others. Every language has exactly the keys of `en`. Values are non-empty strings and may contain a little inline HTML: `<b>`, `<strong>`, `<i>`, `<em>`, `<code>`, `<kbd>`, `<span class="…">`, `<br>`, `<small>`, `<sup>`, `<sub>`, `<a href="https://…">`. No scripts, styles, iframes or event handlers. |
+| `texts` | One object per language: `en`, `pt`, `de`, `es`, `zh`, no others. Every language has exactly the keys of `en`. Values are non-empty strings and may contain a little inline HTML: `<b>`, `<strong>`, `<i>`, `<em>`, `<code>`, `<kbd>`, `<span class="…">`, `<br>`, `<small>`, `<sup>`, `<sub>`, `<a href="https://…">` (or a `/path` or `#anchor` on this site, never `//host`). No scripts, styles, iframes or event handlers. Texts also go into attributes (`alt`, `content`), so a plain `"` or a `<` that does not open one of those tags fails: write `&quot;` (or typographic quotes) and `&lt;`. |
 
 Which keys a page needs is decided by its template here: every `{{key}}` in `site/templates/<platform>.html` that is not
 filled by the build or taken from the shared strings (`platforms.json` → `shared`), plus the keys the build reads
@@ -195,6 +195,7 @@ scripts/build.py          the build (and --serve)
 scripts/content.py        the content contract and its validator
 scripts/sources.py        clones, GitHub API, fingerprint
 scripts/check.py          output checks
+tests/                    unit tests (python3 -m unittest discover -s tests)
 scripts/indexnow.py       IndexNow ping
 firebase.json .firebaserc hosting-redirect/   Firebase Hosting
 ```

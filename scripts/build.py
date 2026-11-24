@@ -479,9 +479,20 @@ class Build:
         head = ctpl.split("<main", 1)[0]
         cards = "".join(f'<div class="box" style="margin-bottom:14px"><h3><a href="/vs/{slug}">Menew vs {esc(c["other"])}</a></h3>'
                         f'<p style="color:var(--muted);font-size:15px">{esc(c["description"])}</p></div>' for slug, c in self.compare.items())
-        index_values = {"title": "Menew compared: free, open source alternatives for Mac utilities",
-                        "description": "How Menew, a free and open source Mac menu bar app, compares with Raycast, Maccy, Rectangle, iStat Menus, CleanShot X and Otter.",
-                        "url": f"{SITE}/vs", "short": "All", "jsonld": "{}", "analytics": ANALYTICS}
+        index_title = "Menew compared: free, open source alternatives for Mac utilities"
+        index_desc = "How Menew, a free and open source Mac menu bar app, compares with Raycast, Maccy, Rectangle, iStat Menus, CleanShot X and Otter."
+        index_ld = {"@context": "https://schema.org", "@graph": [
+            {"@type": "CollectionPage", "name": index_title, "url": f"{SITE}/vs", "description": index_desc, "inLanguage": "en",
+             "publisher": self.org, "dateModified": self.updated,
+             "mainEntity": {"@type": "ItemList", "itemListElement": [
+                 {"@type": "ListItem", "position": i, "name": c["title"], "url": f"{SITE}/vs/{slug}"}
+                 for i, (slug, c) in enumerate(self.compare.items(), 1)]}},
+            {"@type": "BreadcrumbList", "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Menew", "item": SITE + "/"},
+                {"@type": "ListItem", "position": 2, "name": "Comparisons", "item": f"{SITE}/vs"}]},
+        ]}
+        index_values = {"title": index_title, "description": index_desc,
+                        "url": f"{SITE}/vs", "short": "All", "jsonld": ld_json(index_ld), "analytics": ANALYTICS}
         index = re.sub(r"\{\{(\w+)\}\}", lambda m: index_values.get(m.group(1), ""), head)
         index += ('<main class="wrap"><header><div class="eyebrow">Comparisons</div><h1>Menew compared</h1>'
                   '<p class="intro">Menew is one free, open source app for the Mac menu bar that covers the everyday part of several utilities. '
@@ -620,6 +631,7 @@ class Build:
         def add(page):
             nonlocal entries
             alternates = "".join(f'\n    <xhtml:link rel="alternate" hreflang="{LANGS[c][0]}" href="{page_link(c, page) if page else url(c)}"/>' for c in LANGS)
+            alternates += f'\n    <xhtml:link rel="alternate" hreflang="x-default" href="{page_link("en", page) if page else url("en")}"/>'
             entries += "".join(f"\n  <url>\n    <loc>{page_link(c, page) if page else url(c)}</loc>\n    <lastmod>{self.updated}</lastmod>{alternates}\n  </url>"
                                for c in LANGS)
 

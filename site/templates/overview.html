@@ -2,6 +2,7 @@
 <html lang="{{html_lang}}">
 <head>
 <meta charset="utf-8">
+<script>document.documentElement.classList.add('js')</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{{title}}</title>
 <meta name="description" content="{{meta_desc}}">
@@ -406,10 +407,11 @@
   :root[data-theme="dark"] .dark-only { display: block; }
   :root[data-theme="dark"] .light-only { display: none; }
 
-  .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
-  .reveal.in { opacity: 1; transform: none; }
+  /* Só esconde para animar quando o JS roda (classe js no <html>, posta no <head>); sem JS tudo aparece */
+  .js .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+  .js .reveal.in { opacity: 1; transform: none; }
   @media (prefers-reduced-motion: reduce) {
-    .reveal { opacity: 1; transform: none; transition: none; }
+    .js .reveal { opacity: 1; transform: none; transition: none; }
     .desk::before, .pop, .notch .dot { animation: none; }
   }
 
