@@ -104,21 +104,38 @@ def shot_refs(platform, config=None):
     return sorted(per_lang), sorted(english)
 
 
+TAG = re.compile(r"<\s*(/?)\s*([a-zA-Z][a-zA-Z0-9]*)([^<>]*)>")
+ATTR = re.compile(r'([a-zA-Z_:-]+)\s*=\s*"([^"]*)"')
+# Links: https://, a site path (but not //host or /\host, which browsers treat as another site) or an anchor
+SAFE_HREF = re.compile(r"(https://|/(?![/\\])|#)")
+
+
 def check_html(text):
-    """Problems with the inline HTML of one text (empty list when it is fine)."""
+    """Problems with the inline HTML of one text (empty list when it is fine). Texts also land inside attributes
+    (alt="...", content="..."), so a raw " or a < that does not open a complete allowed tag is rejected too."""
     problems = []
-    for m in re.finditer(r"<\s*(/?)\s*([a-zA-Z][a-zA-Z0-9]*)([^>]*)>", text):
+    outside = []      # the text between the tags
+    pos = 0
+    for m in TAG.finditer(text):
+        outside.append(text[pos:m.start()])
+        pos = m.end()
         tag, attrs = m.group(2).lower(), m.group(3)
         if tag not in ALLOWED_TAGS:
             problems.append(f"tag <{tag}> is not allowed (allowed: {', '.join(sorted(ALLOWED_TAGS))})")
             continue
-        if re.sub(r'([a-zA-Z_:-]+)\s*=\s*"([^"]*)"', "", attrs).strip(" /"):
+        if ATTR.sub("", attrs).strip(" /"):
             problems.append(f"<{tag}> attributes must be written as name=\"value\"")
-        for name, value in re.findall(r'([a-zA-Z_:-]+)\s*=\s*"([^"]*)"', attrs):
+        for name, value in ATTR.findall(attrs):
             if name.lower() not in ALLOWED_ATTRS:
                 problems.append(f"attribute {name}= is not allowed in <{tag}>")
-            elif name.lower() == "href" and not re.match(r"(https://|/|#)", value):
-                problems.append(f"link {value!r} must start with https://, / or #")
+            elif name.lower() == "href" and not SAFE_HREF.match(value):
+                problems.append(f"link {value!r} must start with https://, / (not //) or #")
+    outside.append(text[pos:])
+    rest = "".join(outside)
+    if "<" in rest:
+        problems.append("a < that does not open a complete allowed tag is not allowed (write &lt;)")
+    if '"' in rest:
+        problems.append('a raw " is not allowed outside tags (write &quot; or use typographic quotes)')
     if re.search(r"<\s*(script|style|iframe)|javascript:", text, re.I):
         problems.append("scripts, styles and iframes are not allowed")
     return problems
