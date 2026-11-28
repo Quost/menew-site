@@ -83,8 +83,10 @@ def pick_release(repo, channel):
             continue
         if channel == "stable" and rel.get("prerelease"):
             continue
+        # the files people download (the Linux page links the .deb and the AppImage directly)
+        files = {a["name"]: a["browser_download_url"] for a in rel.get("assets") or [] if a.get("state", "uploaded") == "uploaded"}
         return {"tag": rel["tag_name"], "id": rel["id"], "prerelease": bool(rel["prerelease"]),
-                "url": rel["html_url"], "published": (rel.get("published_at") or "")[:10]}
+                "url": rel["html_url"], "published": (rel.get("published_at") or "")[:10], "files": files}
     return None
 
 
@@ -163,7 +165,9 @@ def fingerprint(site, states):
     essence = {"site": site, "platforms": {
         p: {"content": s["content"], "commits": [c["sha"] for c in s.get("commits", [])],
             "release": s["release"] and {"id": s["release"]["id"], "tag": s["release"]["tag"],
-                                         "prerelease": s["release"]["prerelease"]}}
+                                         "prerelease": s["release"]["prerelease"],
+                                         # files are uploaded after the release is created: a build in between must not stick
+                                         "files": sorted(s["release"].get("files") or {})}}
         for p, s in sorted(states.items())}}
     return hashlib.sha256(json.dumps(essence, sort_keys=True).encode()).hexdigest()
 

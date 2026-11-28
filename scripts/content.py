@@ -37,6 +37,7 @@ COMPUTED = {
     "lang_switch", "style", "analytics", "jsonld", "family_band", "family_credit", "js_strings",
     "release_url", "release_version", "badge_label", "palette_cards", "clipboard_cards", "tools_cards", "next_cards",
     "page_title", "page_desc", "robots", "win_badge",
+    "deb_url", "deb_name", "appimage_url", "appimage_name",
 }
 
 
