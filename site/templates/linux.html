@@ -43,6 +43,13 @@
   .next-note a { color: var(--indigo); font-weight: 600; }
   .conn li span { color: var(--muted); }
   .conn li span b { color: var(--text); }
+  /* Instalação */
+  .linst { max-width: 680px; margin: 40px auto 0; }
+  .linst .cmd code { padding: 0; border: 0; background: none; border-radius: 0; }
+  .linst .steps code, .linst .hint code { font-size: 12px; }
+  .linst .dl { margin: 18px 0 4px; }
+  .linst .hint a { color: var(--indigo); font-weight: 600; }
+  .linst .verify { margin-top: 18px; text-align: center; }
   @media (max-width: 960px) {
     .desk-body.linux { grid-template-columns: 1fr; }
     .lshots, .lshots.two { grid-template-columns: 1fr; }
@@ -59,6 +66,7 @@
       <a class="text" href="#clipboard">{{nav_clipboard}}</a>
       <a class="text" href="#tools">{{nav_tools}}</a>
       <a class="text" href="#requirements">{{nav_requirements}}</a>
+      <a class="text" href="#install">{{nav_install}}</a>
       {{lang_switch}}
       <a class="btn small star-btn" data-goatcounter-click="linux-github-nav" href="https://github.com/Quost/menew-linux" target="_blank" rel="noopener">
         <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
@@ -78,13 +86,13 @@
       <h1>{{h1}}</h1>
       <p class="lead">{{lead}}</p>
       <div class="cta">
-        <a class="btn primary" data-goatcounter-click="linux-download-hero" data-rel-link href="{{release_url}}" target="_blank" rel="noopener">{{cta_download}} <span data-rel-version>{{release_version}}</span></a>
+        <a class="btn primary" data-goatcounter-click="linux-download-hero" data-deb-link href="{{deb_url}}">{{cta_deb}} <span data-rel-version>{{release_version}}</span></a>
+        <a class="btn ghost" data-goatcounter-click="linux-install-hero" href="#install">{{cta_install}}</a>
         <a class="btn ghost" data-goatcounter-click="linux-github-hero" href="https://github.com/Quost/menew-linux" target="_blank" rel="noopener">
           <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
           {{cta_github}}<span class="count" data-stars hidden></span>
         </a>
         <a class="btn ghost" data-goatcounter-click="linux-parity-hero" href="https://github.com/Quost/menew-linux/blob/main/docs/parity.md" target="_blank" rel="noopener">{{cta_status}}</a>
-        <a class="btn ghost" data-goatcounter-click="linux-mac-hero" href="{{mac_path}}">{{cta_mac}}</a>
       </div>
       <p class="meta">{{status_note}}</p>
       <p class="meta">{{platforms}}</p>
@@ -219,6 +227,44 @@
   </div>
 </section>
 
+<section id="install">
+  <div class="wrap">
+    <div class="center reveal">
+      <div class="eyebrow">{{install_eyebrow}}</div>
+      <h2>{{install_h2}}</h2>
+      <p class="sub">{{install_sub}}</p>
+    </div>
+    <div class="install linst reveal">
+      <div class="tabs" role="tablist">
+        <button role="tab" aria-selected="true" data-tab="deb">{{tab_deb}}</button>
+        <button role="tab" aria-selected="false" data-tab="appimage">{{tab_appimage}}</button>
+      </div>
+      <div class="panel on" data-panel="deb">
+        <ol class="steps">
+          <li><span>{{deb1}}</span></li>
+          <li><span>{{deb2}}</span></li>
+          <li><span>{{deb3}}</span></li>
+          <li><span>{{deb4}}</span></li>
+        </ol>
+        <div class="cta dl"><a class="btn primary" data-goatcounter-click="linux-download-deb" data-deb-link href="{{deb_url}}">{{cta_deb}} <span data-rel-version>{{release_version}}</span></a></div>
+        <p class="hint">{{deb_cmd}}</p>
+        <div class="cmd"><code>cd /tmp &amp;&amp; wget <span data-deb-url>{{deb_url}}</span> &amp;&amp; sudo apt install ./<span data-deb-name>{{deb_name}}</span></code><button class="copy-btn" data-done="{{copied}}">{{copy}}</button></div>
+        <p class="hint">{{deb_hint}}</p>
+      </div>
+      <div class="panel" data-panel="appimage">
+        <ol class="steps">
+          <li><span>{{app1}}</span></li>
+          <li><span>{{app2}}</span></li>
+        </ol>
+        <div class="cta dl"><a class="btn primary" data-goatcounter-click="linux-download-appimage" data-appimage-link href="{{appimage_url}}">{{cta_appimage}}</a></div>
+        <div class="cmd"><code>chmod +x <span data-appimage-name>{{appimage_name}}</span> &amp;&amp; ./<span data-appimage-name>{{appimage_name}}</span></code><button class="copy-btn" data-done="{{copied}}">{{copy}}</button></div>
+        <p class="hint">{{app_hint}}</p>
+      </div>
+      <p class="hint verify">{{install_verify}}</p>
+    </div>
+  </div>
+</section>
+
 <section id="requirements">
   <div class="wrap">
     <div class="center reveal">
@@ -278,7 +324,8 @@
     <h2>{{final_h2}}</h2>
     <p class="sub" style="margin:0 auto">{{final_sub}}</p>
     <div class="cta" style="margin-top:28px;justify-content:center">
-      <a class="btn primary" data-goatcounter-click="linux-download-final" data-rel-link href="{{release_url}}" target="_blank" rel="noopener">{{cta_download}} <span data-rel-version>{{release_version}}</span></a>
+      <a class="btn primary" data-goatcounter-click="linux-download-final" data-deb-link href="{{deb_url}}">{{cta_deb}} <span data-rel-version>{{release_version}}</span></a>
+      <a class="btn ghost" data-goatcounter-click="linux-install-final" href="#install">{{cta_install}}</a>
       <a class="btn ghost" data-goatcounter-click="linux-github-final" href="https://github.com/Quost/menew-linux" target="_blank" rel="noopener">{{cta_github}}<span class="count" data-stars hidden></span></a>
       <a class="btn ghost" data-goatcounter-click="linux-mac-final" href="{{mac_path}}">{{cta_mac}}</a>
     </div>
@@ -317,7 +364,47 @@
     badge.querySelector("b").textContent = rel.prerelease ? badge.dataset.pre : badge.dataset.stable;
     document.querySelectorAll("[data-rel-version]").forEach(el => { el.textContent = "v" + rel.tag_name.replace(/^v/, ""); });
     document.querySelectorAll("[data-rel-link]").forEach(el => { el.href = rel.html_url; });
+    // the .deb and the AppImage of that release, linked directly
+    const file = suffix => (rel.assets || []).find(a => a.name.endsWith(suffix));
+    const deb = file("_amd64.deb"), app = file("-x86_64.AppImage");
+    if (deb) {
+      document.querySelectorAll("[data-deb-link]").forEach(el => { el.href = deb.browser_download_url; });
+      document.querySelectorAll("[data-deb-url]").forEach(el => { el.textContent = deb.browser_download_url; });
+      document.querySelectorAll("[data-deb-name]").forEach(el => { el.textContent = deb.name; });
+    }
+    if (app) {
+      document.querySelectorAll("[data-appimage-link]").forEach(el => { el.href = app.browser_download_url; });
+      document.querySelectorAll("[data-appimage-name]").forEach(el => { el.textContent = app.name; });
+    }
   }).catch(() => {});
+
+  // Instalação: abas e botões de copiar
+  const track = name => { try { window.goatcounter && window.goatcounter.count({ path: name, event: true }); } catch (e) {} };
+  const openTab = name => {
+    document.querySelectorAll("[data-tab]").forEach(t => t.setAttribute("aria-selected", t.dataset.tab === name));
+    document.querySelectorAll("[data-panel]").forEach(p => p.classList.toggle("on", p.dataset.panel === name));
+  };
+  document.querySelectorAll("[data-tab]").forEach(tab => tab.addEventListener("click", () => { openTab(tab.dataset.tab); track("linux-tab-" + tab.dataset.tab); }));
+  async function copy(btn, text, name) {
+    track("linux-copy-" + name);
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const ta = Object.assign(document.createElement("textarea"), { value: text });
+      ta.style.cssText = "position:fixed;opacity:0";
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand("copy");
+      ta.remove();
+      if (!ok) return;
+    }
+    const label = btn.textContent;
+    btn.textContent = btn.dataset.done;
+    btn.classList.add("done");
+    setTimeout(() => { btn.textContent = label; btn.classList.remove("done"); }, 1600);
+  }
+  document.querySelectorAll(".cmd .copy-btn").forEach(b => b.addEventListener("click", () =>
+    copy(b, b.previousElementSibling.textContent, b.closest("[data-panel]").dataset.panel)));
   const io = new IntersectionObserver(entries => entries.forEach(e => {
     if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
   }), { threshold: .12 });

@@ -550,6 +550,17 @@ class Build:
         rel = self.linux_rel
         cfg = self.config["platforms"]["linux"]
 
+        # the .deb and the AppImage of the release, linked directly (the page's script refreshes them from the API);
+        # before a release has them, the links go to the releases page
+        files = (rel or {}).get("files") or {}
+        def pick(suffix, fallback):
+            name = next((n for n in sorted(files) if n.endswith(suffix)), None)
+            return (files[name], name) if name else ((rel or {}).get("url") or f"{repo_url}/releases", fallback)
+        version = rel["tag"].lstrip("v") if rel else "VERSION"
+        deb_url, deb_name = pick("_amd64.deb", f"menew_{version}_amd64.deb")
+        appimage_url, appimage_name = pick("-x86_64.AppImage", f"Menew-{version}-x86_64.AppImage")
+        linux_files = {"deb_url": deb_url, "deb_name": deb_name, "appimage_url": appimage_url, "appimage_name": appimage_name}
+
         def cards(t, prefix):
             n = sum(1 for k in t if re.fullmatch(rf"{prefix}\d+_t", k))
             return "\n".join(f'      <div class="feature reveal"><h3>{t[f"{prefix}{i}_t"]}</h3><p>{t[f"{prefix}{i}_d"]}</p></div>'
@@ -583,9 +594,12 @@ class Build:
             ]}
             if rel:
                 ld["@graph"][1]["softwareVersion"] = rel["tag"].lstrip("v")
+                if files:
+                    ld["@graph"][1]["downloadUrl"] = deb_url
             self.platform_page("linux", lang, ld, {
                 "release_url": rel["url"] if rel else f"{repo_url}/releases",
                 "release_version": rel["tag"] if rel else "",
+                **linux_files,
                 "badge_label": t["badge_pre"] if self.linux_pre else t["badge_stable"],
                 "palette_cards": cards(t, "pc"), "clipboard_cards": cards(t, "cc"), "tools_cards": cards(t, "tl"),
                 "next_cards": cards(t, "n"),
